@@ -1,0 +1,36 @@
+# Mostly an adaptation of the rules specified in the ABNF spec, adapted to
+# the specific syntax of Mashup's EBNF.
+
+rule = rule-name "=" definition
+     | *c-wsp comment;
+
+c-nl  = comment | CRLF;
+c-wsp = WSP | (c-nl WSP);
+
+comment    = "#" *GRAPH CRLF;
+rule-name  = *c-wsp non-terminal *c-wsp;
+definition = *c-wsp expression *c-wsp ";" *c-wsp;
+
+symbol = non-terminal | terminal;
+
+non-terminal = ALPHA *(ALPHA | DIGIT | "-");
+terminal     = i-terminal | s-terminal | prose;
+i-terminal   = DQUOTE *GRAPH DQUOTE;
+s-terminal   = "`" *GRAPH "`";
+prose        = "<" *GRAPH ">";
+
+expression    = concatenation *(*c-wsp "|" concatenation);
+concatenation = repetition *(1*c-wsp repetition);
+repetition    = *DIGIT "*" *DIGIT selection;
+selection     = *DIGIT "/" *DIGIT value;
+# (i.e. "1*2/(A B)" == "1*2(/(A B))", NOT "1*(2/(A B))".)
+value         = symbol         | encoded-value
+              | sequence-group | permutation-group;
+
+encoded-value = "%" (binary-value | decimal-value | hex-value);
+binary-value  = "b" 1*BIT *1(("." 1*BIT) | "-" 1*BIT);
+decimal-value = "d" 1*DIGIT *1(("." 1*DIGIT) | "-" 1*DIGIT);
+hex-value     = "x" 1*HEXDIG *1(("." 1*HEXDIG) | "-" 1*HEXDIG);
+
+sequence-group    = "(" *c-wsp expression *c-wsp ")";
+permutation-group = "[" *c-wsp expression *c-wsp "]";
