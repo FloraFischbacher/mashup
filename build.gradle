@@ -31,9 +31,9 @@ dependencies {
     implementation group: 'com.formdev', name: 'flatlaf-extras', version: '3.6.2'
     implementation group: 'com.github.weisj', name: 'jsvg', version: '2.0.0'
 
-    // Used to decompress .mash files (which are actually just .tar.zst files
-    // in disguise) during mod-loading or compress folders into .mash files
-    // when
+    // Used to decompress .tape files (which are actually just .tar.zst files
+    // in disguise) during mod-loading or compress folders into .tape files
+    // when using the developer tool `mashup pack`.
     implementation 'org.apache.commons:commons-compress:1.28.0'
 }
 
