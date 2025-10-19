@@ -1,0 +1,46 @@
+# Definition of Mashup's configuration format, .mash, using Mashup BNF.
+
+# Very much a sketch more than a true-to-life specification at the moment:
+# nothing here has been proof-read for errors.
+
+grammar     = *c-wsp definitions *c-wsp
+definitions = [mod *import *1config *patch];
+
+mod    = *c-wsp "mod" *c-wsp string *c-wsp;
+import = *c-wsp "import" *c-wsp path *c-wsp;
+config = *c-wsp "config" *c-wsp "{" *field "}" *c-wsp;
+patch  = *c-wsp "patch" *c-wsp "{" *(depend | assignment | effect) "}" *c-wsp;
+
+field = *c-wsp "field" *c-wsp iden
+    *c-wsp "is" *c-wsp type
+    *c-wsp "{" option "}" *c-wsp;
+
+type = 
+    single : "boolean"
+           | "number" | "integer"
+           | "string" | "translation" | "option"
+           | "patch",
+    list   : type.single *c-wsp "list",
+    table  : type.single *c-wsp "and" *c-wsp (type.single | type.list) "table";
+
+depend     = "";
+assignment = "";
+effect     = "";
+
+string = DQUOTE *(GRAPH | var) DQUOTE;
+
+path = DQUOTE ("res://" | "user://" | 1*("/" | var "/")) *dir file DQUOTE;
+file = "";
+dir  = "/";
+
+iden   = (ALPHA | "_") *(DIGIT | ALPHA | "_");
+mod-id = iden ":" iden;
+var    = "$" iden;
+loc    = "@" iden;
+config = "?" iden;
+
+line-comment  = "//";
+block-comment = "/*" *(GRAPH | block-comment) "*/";
+
+c-wsp = <TODO add the definition for this>;
+c-nl = <TODO add the definition for this>;
