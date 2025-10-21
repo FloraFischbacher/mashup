@@ -29,8 +29,16 @@ public class GDREToolsInstall {
 
     public GDREToolsInstall() {
         if (!this.exists()) {
-            this.download();
-            this.install();
+            try {
+                Files.createDirectories(Path.of(gdreDir));
+                
+                this.download();
+                this.install();
+            } catch (IOException e) {
+                throw new RuntimeException (
+                    "Unable to create Mashup directory; are your permissions correct?"
+                );
+            }
         }
     }
 
@@ -38,12 +46,13 @@ public class GDREToolsInstall {
         Path gdrePath;
         String gdreFile = switch (Mashup.getPlatform()) {
             case Mashup.Platform.WINDOWS -> "gdre_tools.exe";
-            case Mashup.Platform.MACOS   -> "/Godot RE Tools.app/Contents/MacOS/Godot RE Tools";
+            case Mashup.Platform.MACOS   ->
+                "/Godot RE Tools.app/Contents/MacOS/Godot RE Tools";
             case Mashup.Platform.LINUX   -> "gdre_tools.x86_64";
         };
 
         try {
-            gdrePath = Path.of(gdreDir + gdreFile);
+            gdrePath = Path.of(gdreDir, gdreFile);
         } catch (InvalidPathException _) {
             return false;
         }

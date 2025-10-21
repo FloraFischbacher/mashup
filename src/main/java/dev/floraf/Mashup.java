@@ -1,6 +1,7 @@
 package dev.floraf;
 
 import org.apache.logging.log4j.Logger;
+
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.apache.logging.log4j.LogManager;
@@ -51,7 +52,7 @@ public class Mashup {
             case Platform.MACOS -> System.getProperty("user.home")
                 + "/Library/Preferences/Mashup";
             case Platform.LINUX -> ObjectUtils.firstNonNull(
-                System.getenv("XDG_CONFIG_HOME"),
+                System.getenv("XDG_CONFIG_HOME") + "/Mashup",
                 System.getProperty("user.home") + "/.config"
             ) + "/Mashup";
         };
