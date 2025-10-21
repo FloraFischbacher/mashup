@@ -100,12 +100,32 @@ public class DependencyGraph {
     }
 
     public boolean removeVertex(int target) {
-        if (target > vertices.size() || target < 0) return false;
+        if (target >= vertices.size() || target < 0) return false;
 
         Optional<Vertex> toRemove = vertices.get(target);
         if (toRemove.isEmpty()) return false;
         
-        outgoing.remove(target);
+        incoming.set(target, Optional.empty());
+        outgoing.set(target, Optional.empty());
+        
+        for (int v = 0; v < incoming.size(); v++) {
+            Optional<ArrayList<Integer>> inc = incoming.get(v);
+            Optional<ArrayList<Integer>> out = outgoing.get(v);
+
+            if (inc.isPresent()) {
+                ArrayList<Integer> arr = inc.get();
+                for (int i = 0; i < arr.size(); i++) {
+                    if (arr.get(i) == target) arr.remove(i);
+                }
+            }
+
+            if (out.isPresent()) {
+                ArrayList<Integer> arr = inc.get();
+                for (int o = 0; o < arr.size(); o++) {
+                    if (arr.get(o) == target) arr.remove(o);
+                }
+            }
+        }
 
         return true;
     }
