@@ -35,6 +35,13 @@ dependencies {
     // in disguise) during mod-loading or compress folders into .tape files
     // when using the developer tool `mashup pack`.
     implementation 'org.apache.commons:commons-compress:1.28.0'
+
+    implementation 'org.apache.commons:commons-lang3:3.19.0'
+    implementation 'commons-io:commons-io:2.20.0'
+
+    // Temporary dependency to allow for the sketched-out implementation of the
+    // GDRE Tools wrapper to just work properly. 
+    implementation 'net.lingala.zip4j:zip4j:2.11.5'
 }
 
 compileJava {
