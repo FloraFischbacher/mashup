@@ -2,6 +2,11 @@ package dev.floraf.loader.data;
 
 import java.util.*;
 
+import dev.floraf.loader.data.exception.RequiredPatchException;
+import dev.floraf.loader.misc.either.Either;
+import dev.floraf.loader.misc.either.Left;
+import dev.floraf.loader.misc.either.Right;
+
 /**
  * An implementation of a directed acyclic graph that serves as a means of
  * tracking dependencies of Mashup mods through the use of Tarjan's strongly-

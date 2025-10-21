@@ -1,4 +1,4 @@
-package dev.floraf.loader.data;
+package dev.floraf.loader.data.exception;
 
 /**
  * 
