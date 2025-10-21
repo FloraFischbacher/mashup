@@ -1,7 +1,6 @@
 package dev.floraf.loader.data;
 
 import java.util.*;
-import java.util.function.Consumer;
 
 /**
  * An implementation of a directed acyclic graph that serves as a means of
@@ -10,18 +9,18 @@ import java.util.function.Consumer;
  * that the graph is, in fact, a DAG.
  */
 public class DependencyGraph {
-    private int current = -1;
+    private int currentVertex = -1;
 
-    private ArrayList<Vertex> vertices = new ArrayList<>();
+    private ArrayList<Optional<Vertex>> vertices = new ArrayList<>();
 
     /**
      *
      */
-    private HashMap<Integer, HashSet<Integer>> incoming = new HashMap<>();
+    private ArrayList<Optional<ArrayList<Integer>>> incoming = new ArrayList<>();
     /**
      *
      */
-    private HashMap<Integer, HashSet<Integer>> outgoing = new HashMap<>();
+    private ArrayList<Optional<ArrayList<Integer>>> outgoing = new ArrayList<>();
     /**
      * 
      */
@@ -33,7 +32,7 @@ public class DependencyGraph {
      */
     public class Vertex {
         int id;
-        MashupPatch data;
+        Optional<MashupPatch> data;
 
         int index = -1;
         int lowlink = -1;
@@ -53,13 +52,13 @@ public class DependencyGraph {
         }
 
         public Vertex(MashupPatch data) {
-            current += 1;
+            currentVertex += 1;
 
-            this.id = current;
-            this.data = data;
+            this.id = currentVertex;
+            this.data = Optional.of(data);
 
-            incoming.put(current, new HashSet<>());
-            outgoing.put(current, new HashSet<>());
+            incoming.add(currentVertex, Optional.of(new ArrayList<>()));
+            outgoing.add(currentVertex, Optional.of(new ArrayList<>()));
             byPatchId.put(data, this);
         }
     }
@@ -73,8 +72,15 @@ public class DependencyGraph {
         DependencyType type;
 
         public Edge(int source, int target, DependencyType type) {
+            this.source = source;
+            this.target = target;
+            this.type = type;
+
             // This shouldn't ever happen, but I'm not taking any chances.
-            if (!incoming.containsKey(source) || !incoming.containsKey(target)) {
+            if (
+                incoming.get(source).isEmpty()
+                || outgoing.get(target).isEmpty()
+            ) {
                 throw new IllegalArgumentException();
             }
 
@@ -83,17 +89,34 @@ public class DependencyGraph {
                     "A patch can't depend on itself!");
             }
 
-            outgoing.get(source).add(target);
-            incoming.get(target).add(source);
+            outgoing.get(source).get().add(target);
+            incoming.get(target).get().add(source);
         }
     }
 
-    /**
-     * Traverses through the graph's vertices to find a list of
-     * @return
-     */
-    public boolean analyze() {
+    public boolean removeVertex(int target) {
+        if (target > vertices.size() || target < 0) return false;
+
+        Optional<Vertex> toRemove = vertices.get(target);
+        if (toRemove.isEmpty()) return false;
+        
+        outgoing.remove(target);
+
         return true;
+    }
+
+    public boolean removeEdge(int source, int target) {
+        return true;
+    }
+
+    /**
+     * Traverses through the graph's vertices to find which dependencies are
+     * satisfied and responds appropriately if they are not found.
+     */
+    public void analyze() throws RequiredPatchException {
+        for (Optional<Vertex> vertex : vertices) {
+            if (vertex.isEmpty()) continue;
+        }
     }
 
     /**
@@ -125,8 +148,8 @@ public class DependencyGraph {
                 dfsStack.push(vertex);
                 vertex.onStack = true;
 
-                for (int edge : outgoing.get(vertex.id)) {
-                    Vertex child = vertices.get(edge);
+                for (int edge : outgoing.get(vertex.id).get()) {
+                    Vertex child = vertices.get(edge).get();
 
                     if (child.index == -1) {
                         search(child);
@@ -154,9 +177,9 @@ public class DependencyGraph {
 
         DFS dfs = new DFS();
 
-        for (Vertex vertex : vertices) {
-            if (vertex.index == -1) {
-                dfs.search(vertex);
+        for (Optional<Vertex> vertex : vertices) {
+            if (vertex.get().index == -1) {
+                dfs.search(vertex.get());
             }
         }
 
