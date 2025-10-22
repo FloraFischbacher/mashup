@@ -11,7 +11,7 @@ public class MashupConfig {
         instance = this;
     }
 
-    public static MashupConfig getInstance() {
+    public static MashupConfig get() {
         if (instance == null) instance = new MashupConfig();
         return instance;
     }
